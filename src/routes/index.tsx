@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState, createContext, useContext, useCallback } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { z } from "zod";
@@ -368,6 +368,7 @@ function Header() {
           <a href="#instructions" className="hover:text-foreground">Instructions</a>
           <a href="#pricing" className="hover:text-foreground">Pricing</a>
           <a href="#apply" className="hover:text-foreground">Apply</a>
+          <Link to="/track" className="hover:text-foreground text-primary font-medium">Track Status</Link>
           <a href="#support" className="hover:text-foreground">Support</a>
         </nav>
         <a href={WHATSAPP_URL} target="_blank" rel="noreferrer">
@@ -890,6 +891,9 @@ function SuccessCard({ id, onReset }: { id: string; onReset: () => void }) {
                 <MessageCircle className="mr-1.5 h-4 w-4" /> Chat on WhatsApp
               </Button>
             </a>
+            <Link to="/track">
+              <Button variant="secondary">Track Status</Button>
+            </Link>
             <Button variant="outline" onClick={onReset}>Submit another</Button>
           </div>
         </div>
