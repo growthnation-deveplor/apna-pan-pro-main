@@ -20,7 +20,7 @@ export const adminListApplications = createServerFn({ method: "GET" })
     const { data, error } = await context.supabase
       .from("pan_applications")
       .select(
-        "id, full_name, customer_mobile, email, district, application_status, submission_status, payment_verified_at, dob_proof_url, created_at",
+        "id, application_no, full_name, customer_mobile, email, district, application_status, submission_status, payment_verified_at, dob_proof_url, created_at",
       )
       .order("created_at", { ascending: false })
       .limit(500);
@@ -92,7 +92,7 @@ export const adminListApplicationDocuments = createServerFn({ method: "GET" })
     const { data, error } = await context.supabase
       .from("pan_applications")
       .select(
-        "id, full_name, customer_mobile, email, district, application_status, created_at, aadhaar_url, dob_proof_url, photo_url, signature_url, payment_screenshot_url",
+        "id, application_no, full_name, customer_mobile, email, district, application_status, created_at, aadhaar_url, dob_proof_url, photo_url, signature_url, payment_screenshot_url",
       )
       .order("created_at", { ascending: false })
       .limit(100);
@@ -146,6 +146,7 @@ export const adminUpdateStatus = createServerFn({ method: "POST" })
           "rejected",
           "completed",
         ]),
+        status_reason: z.string().optional(),
       })
       .parse(d),
   )
@@ -155,6 +156,7 @@ export const adminUpdateStatus = createServerFn({ method: "POST" })
       .from("pan_applications")
       .update({
         application_status: data.status,
+        status_reason: data.status_reason || null,
         status_updated_at: new Date().toISOString(),
         status_updated_by: context.userId,
       })

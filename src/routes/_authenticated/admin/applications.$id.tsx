@@ -206,16 +206,29 @@ function AppDetail() {
     onError: (e: any) => toast.error(e.message),
   });
 
+  const [pendingStatus, setPendingStatus] = useState<string | null>(null);
+  const [statusReason, setStatusReason] = useState("");
+
   async function changeStatus(status: string) {
+    if (status === "rejected" || status === "need_more_documents" || status === "hold") {
+      setPendingStatus(status);
+      return;
+    }
+    await commitStatus(status, "");
+  }
+
+  async function commitStatus(status: string, reason: string) {
     setSavingStatus(true);
+    setPendingStatus(null);
     try {
-      await updateFn({ data: { id, status: status as any } });
+      await updateFn({ data: { id, status: status as any, status_reason: reason } });
       await qc.invalidateQueries({ queryKey: ["admin-app", id] });
       toast.success("Status updated");
     } catch (e: any) {
       toast.error(e.message);
     } finally {
       setSavingStatus(false);
+      setStatusReason("");
     }
   }
 
@@ -242,7 +255,7 @@ function AppDetail() {
         <div>
           <h1 className="text-2xl font-bold">{app.full_name}</h1>
           <p className="text-muted-foreground text-sm">
-            Submitted {new Date(app.created_at).toLocaleString("en-IN")}
+            App No: <span className="font-mono">{app.application_no || "—"}</span> • Submitted {new Date(app.created_at).toLocaleString("en-IN")}
           </p>
         </div>
         <div className="flex gap-2 items-center">
@@ -259,6 +272,25 @@ function AppDetail() {
             </SelectContent>
           </Select>
           {savingStatus && <Loader2 className="h-4 w-4 animate-spin" />}
+
+          <Dialog open={!!pendingStatus} onOpenChange={(o) => !o && setPendingStatus(null)}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Reason for {pendingStatus?.replace(/_/g, " ")}</DialogTitle>
+              </DialogHeader>
+              <Textarea
+                placeholder="Enter the reason here..."
+                value={statusReason}
+                onChange={(e) => setStatusReason(e.target.value)}
+              />
+              <div className="flex justify-end gap-2 mt-4">
+                <Button variant="outline" onClick={() => setPendingStatus(null)}>Cancel</Button>
+                <Button onClick={() => commitStatus(pendingStatus!, statusReason)} disabled={!statusReason.trim()}>
+                  Update Status
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
 
@@ -379,6 +411,12 @@ function AppDetail() {
                   <div className="text-xs text-muted-foreground">
                     {new Date(app.status_updated_at).toLocaleString("en-IN")}
                   </div>
+                  {app.status_reason && (
+                    <div className="mt-1.5 text-sm bg-muted p-2.5 rounded-md border text-foreground/85">
+                      <span className="font-semibold text-xs block mb-0.5 opacity-70">Reason</span>
+                      {app.status_reason}
+                    </div>
+                  )}
                 </div>
               </div>
               <div className="flex items-start gap-3">

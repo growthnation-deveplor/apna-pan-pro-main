@@ -81,6 +81,8 @@ export type Database = {
           aadhaar_url: string
           agency_mobile: string
           application_status: string
+          application_no: string | null
+          status_reason: string | null
           city: string
           created_at: string
           customer_mobile: string
@@ -108,6 +110,8 @@ export type Database = {
           aadhaar_url: string
           agency_mobile: string
           application_status?: string
+          application_no?: string | null
+          status_reason?: string | null
           city: string
           created_at?: string
           customer_mobile: string
@@ -135,6 +139,8 @@ export type Database = {
           aadhaar_url?: string
           agency_mobile?: string
           application_status?: string
+          application_no?: string | null
+          status_reason?: string | null
           city?: string
           created_at?: string
           customer_mobile?: string

@@ -43,9 +43,11 @@ export const submitApplication = createServerFn({ method: "POST" })
         sign(data.aadhaar_path),
         sign(data.dob_proof_path ?? null),
         sign(data.photo_path),
-        sign(data.signature_path),
         sign(data.payment_screenshot_path),
       ]);
+
+    const crypto = await import("crypto");
+    const application_no = `PAN-${crypto.randomBytes(4).toString("hex").toUpperCase()}`;
 
     const row = {
       agency_mobile: data.agency_mobile,
@@ -65,6 +67,7 @@ export const submitApplication = createServerFn({ method: "POST" })
       signature_url: signature_url!,
       payment_screenshot_url: payment_screenshot_url!,
       submission_status: "pending" as const,
+      application_no,
     };
 
     const { data: inserted, error: insertErr } = await supabaseAdmin
@@ -99,5 +102,5 @@ export const submitApplication = createServerFn({ method: "POST" })
       }
     }
 
-    return { id: inserted.id, sheet_synced: sheetSynced };
+    return { id: inserted.id, application_no, sheet_synced: sheetSynced };
   });
