@@ -47,8 +47,8 @@ export const submitApplication = createServerFn({ method: "POST" })
         sign(data.payment_screenshot_path),
       ]);
 
-    const crypto = await import("crypto");
-    const application_no = `PAN-${crypto.randomBytes(4).toString("hex").toUpperCase()}`;
+    const randomHex = Math.random().toString(16).slice(2, 8).toUpperCase();
+    const application_no = `PAN-${randomHex}`;
 
     const row = {
       agency_mobile: data.agency_mobile,
