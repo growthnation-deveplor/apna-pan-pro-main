@@ -72,7 +72,7 @@ function AuthPage() {
               autoComplete="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="info@admin.com"
+              placeholder="misbahur@admin.com"
             />
           </div>
           <div className="space-y-2">
@@ -125,7 +125,7 @@ function AuthPage() {
             )}
           </Button>
           <p className="text-center text-xs text-muted-foreground">
-            Demo: info@admin.com / admin123
+            Demo: misbahur@admin.com / admin123
           </p>
         </form>
       </div>

@@ -15,6 +15,13 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
 import { cn } from "@/lib/utils";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 
 export const Route = createFileRoute("/")({
@@ -39,7 +46,7 @@ export const Route = createFileRoute("/")({
 });
 
 const WHATSAPP_URL = "https://wa.me/918018923277";
-const SUPPORT_EMAIL = "contactgrowthnation@gmail.com";
+const SUPPORT_EMAIL = "misbahur@admin.com";
 const SUPPORT_PHONE = "+91 8018923277";
 const PAYMENT_QR_IMAGE = "https://lh7-rt.googleusercontent.com/formsz/AN7BsVAfsHw86vNhlMgD0vz99Pn-IrNsrwCa9iAB6b1j5VybZ5QNoW-Lyo1KjKY0OtaHa1pmsOKGRr6Kw745vLmGc7SobUQE_FRjWMdMzaCi4xdT1YNrg-gVzAI_01zIfP8uG5rMoKFeqvVrTk5WJ95KlFu4_DRXY6yPO9PJ-XwD5dhlcM5ARRd3ms_mLQPe4a-jZSqr68hLFx0lUerkS8NbMYA=w339?key=BlLx_XPd1UAour9X2CCc8w";
 
@@ -285,7 +292,7 @@ function ApplicationProvider({ children }: { children: React.ReactNode }) {
         },
       });
 
-      setSuccess(res.id);
+      setSuccess(res.application_no || res.id.slice(0, 8).toUpperCase());
       setForm(emptyForm);
       setFiles(emptyFiles);
       document.getElementById("apply")?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -590,102 +597,39 @@ function ApplicationForm() {
         </p>
       </div>
 
-      {/* Application Type Selector */}
-      <div id="application-type-selector" className="mx-auto mb-6 max-w-4xl">
-        <div className="mb-3 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <IndianRupee className="h-5 w-5 text-primary" />
-            <span className={cn("text-base font-semibold", applicationTypeError ? "text-destructive" : "")}>
-              Select Application Type
-            </span>
-            <span className="text-destructive">*</span>
-          </div>
-          {applicationTypeError && (
-            <span className="flex items-center gap-1 text-xs font-medium text-destructive">
-              <AlertTriangle className="h-3.5 w-3.5" /> Please select one to continue
-            </span>
-          )}
-        </div>
-        <div className={cn(
-          "grid gap-4 sm:grid-cols-2 rounded-2xl transition-all duration-200",
-          applicationTypeError ? "ring-2 ring-destructive/50 p-3 bg-destructive/5" : "",
-        )}>
-          {APPLICATION_TYPES.map((plan) => {
-            const isSelected = applicationType === plan.key;
-            return (
-              <button
-                key={plan.key}
-                type="button"
-                onClick={() => {
-                  setApplicationType(plan.key);
-                  setApplicationTypeError(false);
-                }}
-                className={cn(
-                  "relative overflow-hidden rounded-2xl border-2 bg-card p-5 text-left shadow-[var(--shadow-soft)] transition-all duration-200 hover:shadow-[var(--shadow-elegant)]",
-                  isSelected
-                    ? plan.tone === "success"
-                      ? "border-success ring-2 ring-success/30"
-                      : "border-warning ring-2 ring-warning/30"
-                    : applicationTypeError
-                      ? "border-destructive/60 hover:border-destructive"
-                      : "border-border hover:border-muted-foreground/40",
-                )}
-              >
-                {/* Tag */}
-                <div
-                  className={cn(
-                    "absolute right-3 top-3 rounded-full px-2.5 py-0.5 text-[10px] font-semibold",
-                    plan.tone === "success" ? "bg-success/15 text-success" : "bg-warning/20 text-warning-foreground",
-                  )}
-                >
-                  {plan.tag}
-                </div>
 
-                {/* Icon */}
-                <div
-                  className={cn(
-                    "mb-3 inline-grid h-10 w-10 place-items-center rounded-xl",
-                    plan.tone === "success" ? "bg-success text-success-foreground" : "bg-warning text-warning-foreground",
-                  )}
-                >
-                  {plan.tone === "success" ? <CheckCircle2 className="h-5 w-5" /> : <AlertTriangle className="h-5 w-5" />}
-                </div>
-
-                <div className="pr-16">
-                  <div className="font-semibold">{plan.title}</div>
-                  <div className="mt-0.5 text-xs text-muted-foreground">{plan.desc}</div>
-                </div>
-
-                <div className="mt-4 flex items-baseline gap-1">
-                  <IndianRupee className="h-5 w-5 text-foreground" />
-                  <span className="text-3xl font-bold">{plan.price}</span>
-                  <span className="ml-1 text-xs text-muted-foreground">/ application</span>
-                </div>
-
-                {/* Selected indicator */}
-                {isSelected && (
-                  <div
-                    className={cn(
-                      "absolute bottom-0 left-0 right-0 h-1 rounded-b-2xl",
-                      plan.tone === "success" ? "bg-success" : "bg-warning",
-                    )}
-                  />
-                )}
-              </button>
-            );
-          })}
-        </div>
-        {applicationTypeError && (
-          <p className="mt-2 flex items-center gap-1.5 text-sm font-medium text-destructive">
-            <AlertTriangle className="h-4 w-4" />
-            You must select an application type to proceed.
-          </p>
-        )}
-      </div>
 
       <form id="apply-form" onSubmit={onSubmit} className="mx-auto max-w-4xl space-y-6">
         <Card title="Applicant Details" icon={FileText}>
           <Grid>
+            <div className="sm:col-span-2" id="application-type-selector">
+              <Field
+                label="Select Application Type"
+                required
+                error={applicationTypeError ? "Please select one to continue" : undefined}
+                touched={true}
+                valid={!applicationTypeError && applicationType !== null}
+              >
+                <Select
+                  value={applicationType || ""}
+                  onValueChange={(val: NonNullable<ApplicationType>) => {
+                    setApplicationType(val);
+                    setApplicationTypeError(false);
+                  }}
+                >
+                  <SelectTrigger className={cn("w-full h-11", applicationTypeError ? "border-destructive ring-1 ring-destructive" : "")}>
+                    <SelectValue placeholder="Select application type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {APPLICATION_TYPES.map((plan) => (
+                      <SelectItem key={plan.key} value={plan.key}>
+                        {plan.title} - ₹{plan.price}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </Field>
+            </div>
             <Field
               label="Apna PAN Agency Registered Mobile Number"
               required
@@ -921,7 +865,6 @@ function ApplicationForm() {
 
 
 function SuccessCard({ id, onReset }: { id: string; onReset: () => void }) {
-  const short = useMemo(() => id.slice(0, 8).toUpperCase(), [id]);
   return (
     <section className="container mx-auto px-4 py-20">
       <div className="mx-auto max-w-xl overflow-hidden rounded-2xl border bg-card shadow-[var(--shadow-elegant)]">
@@ -936,7 +879,7 @@ function SuccessCard({ id, onReset }: { id: string; onReset: () => void }) {
         </div>
         <div className="space-y-4 p-6 text-center">
           <div className="rounded-lg bg-muted p-3 text-sm">
-            Reference ID: <span className="font-mono font-semibold">{short}</span>
+            Reference ID: <span className="font-mono font-semibold">{id}</span>
           </div>
           <div className="text-sm text-muted-foreground">
             For any help, reach our WhatsApp support team.

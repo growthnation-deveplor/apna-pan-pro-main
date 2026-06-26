@@ -13,7 +13,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { CheckCircle2, ExternalLink, XCircle } from "lucide-react";
+import { CheckCircle2, ExternalLink, XCircle, Image as ImageIcon } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/admin/payments")({
@@ -97,11 +97,18 @@ function PaymentsPage() {
                   </TableCell>
                   <TableCell>
                     <div className="flex gap-2">
-                      <Link to="/admin/applications/$id" params={{ id: r.id }}>
+                      <Link to="/admin/applications/$id" params={{ id: r.id }} title="View details">
                         <Button variant="ghost" size="sm">
                           <ExternalLink className="h-4 w-4" />
                         </Button>
                       </Link>
+                      {r.payment_screenshot_url && (
+                        <a href={r.payment_screenshot_url} target="_blank" rel="noreferrer" title="View screenshot">
+                          <Button variant="ghost" size="sm">
+                            <ImageIcon className="h-4 w-4" />
+                          </Button>
+                        </a>
+                      )}
                       {!r.payment_verified_at ? (
                         <Button
                           size="sm"
