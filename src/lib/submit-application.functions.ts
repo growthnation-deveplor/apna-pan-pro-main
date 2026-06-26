@@ -43,6 +43,7 @@ export const submitApplication = createServerFn({ method: "POST" })
         sign(data.aadhaar_path),
         sign(data.dob_proof_path ?? null),
         sign(data.photo_path),
+        sign(data.signature_path),
         sign(data.payment_screenshot_path),
       ]);
 
