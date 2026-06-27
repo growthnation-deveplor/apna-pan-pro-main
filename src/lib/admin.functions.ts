@@ -28,20 +28,6 @@ export const adminListApplications = createServerFn({ method: "GET" })
     return data ?? [];
   });
 
-// Extract the storage object path from a stored signed/public URL.
-// Returns e.g. "<uuid>/aadhaar/<file>.pdf" for our pan-documents bucket.
-function extractStoragePath(url: string | null | undefined): string | null {
-  if (!url) return null;
-  try {
-    const u = new URL(url);
-    const marker = "/pan-documents/";
-    const idx = u.pathname.indexOf(marker);
-    if (idx === -1) return null;
-    return decodeURIComponent(u.pathname.slice(idx + marker.length));
-  } catch {
-    return null;
-  }
-}
 
 export const adminGetApplication = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
@@ -61,27 +47,6 @@ export const adminGetApplication = createServerFn({ method: "GET" })
       .eq("application_id", data.id)
       .order("created_at", { ascending: false });
 
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const ONE_HOUR = 60 * 60;
-    const fields = [
-      "aadhaar_url",
-      "dob_proof_url",
-      "photo_url",
-      "signature_url",
-      "payment_screenshot_url",
-    ] as const;
-
-    await Promise.all(
-      fields.map(async (field) => {
-        const path = extractStoragePath((app as any)[field]);
-        if (!path) return;
-        const { data: signed } = await supabaseAdmin.storage
-          .from("pan-documents")
-          .createSignedUrl(path, ONE_HOUR);
-        if (signed?.signedUrl) (app as any)[field] = signed.signedUrl;
-      }),
-    );
-
     return { app, notes: notes ?? [] };
   });
 
@@ -99,35 +64,7 @@ export const adminListApplicationDocuments = createServerFn({ method: "GET" })
       
     if (error) throw new Error(error.message);
     
-    const apps = data ?? [];
-    
-    // Sign URLs
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const ONE_HOUR = 60 * 60;
-    const fields = [
-      "aadhaar_url",
-      "dob_proof_url",
-      "photo_url",
-      "signature_url",
-      "payment_screenshot_url",
-    ] as const;
-
-    await Promise.all(
-      apps.map(async (app) => {
-        await Promise.all(
-          fields.map(async (field) => {
-            const path = extractStoragePath((app as any)[field]);
-            if (!path) return;
-            const { data: signed } = await supabaseAdmin.storage
-              .from("pan-documents")
-              .createSignedUrl(path, ONE_HOUR);
-            if (signed?.signedUrl) (app as any)[field] = signed.signedUrl;
-          })
-        );
-      })
-    );
-
-    return apps;
+    return data ?? [];
   });
 
 export const adminUpdateStatus = createServerFn({ method: "POST" })
