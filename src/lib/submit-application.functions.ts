@@ -47,7 +47,7 @@ export const submitApplication = createServerFn({ method: "POST" })
         sign(data.payment_screenshot_path),
       ]);
 
-    const randomHex = Math.random().toString(36).substring(2, 10).toUpperCase();
+    const randomHex = Math.random().toString(16).slice(2, 8).toUpperCase();
     const application_no = `PAN-${randomHex}`;
 
     const row = {
