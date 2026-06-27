@@ -20,7 +20,7 @@ export const adminListApplications = createServerFn({ method: "GET" })
     const { data, error } = await context.supabase
       .from("pan_applications")
       .select(
-        "id, application_no, full_name, customer_mobile, email, district, application_status, submission_status, payment_verified_at, dob_proof_url, created_at",
+        "id, application_no, full_name, customer_mobile, agency_mobile, email, district, application_status, submission_status, payment_verified_at, dob_proof_url, payment_screenshot_url, created_at"
       )
       .order("created_at", { ascending: false })
       .limit(500);

@@ -396,6 +396,7 @@ function AppDetail() {
                 <Field icon={MapPin} label="Village / Locality" value={app.village} />
                 <Field icon={Building} label="Post Office" value={app.post_office} />
                 <Field icon={Building} label="City / Town" value={app.city} />
+                <Field icon={MapPin} label="State" value={app.state} />
                 <Field icon={Hash} label="PIN Code" value={app.pin_code} />
               </div>
             </Card>

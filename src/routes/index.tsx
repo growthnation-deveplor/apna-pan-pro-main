@@ -293,11 +293,16 @@ function ApplicationProvider({ children }: { children: React.ReactNode }) {
     const parsed = formSchema.safeParse(form);
     if (!parsed.success) {
       const fe: Partial<Record<keyof FormFields, string>> = {};
+      const te: Partial<Record<keyof FormFields, boolean>> = {};
       parsed.error.issues.forEach((i) => {
         const k = i.path[0] as keyof FormFields;
-        if (!fe[k]) fe[k] = i.message;
+        if (!fe[k]) {
+          fe[k] = i.message;
+          te[k] = true;
+        }
       });
       setErrors(fe);
+      setTouched((prev) => ({ ...prev, ...te }));
       toast.error("Please fix the highlighted fields");
       return;
     }
